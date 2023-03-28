@@ -27,7 +27,7 @@ client.on('interactionCreate', async interaction => {
         const channel = interaction.options.getChannel('channel') ?? interaction.channel;
         const server = interaction.guildId;
         interaction.reply(`Fetching data for user: ${target.username} in ${channel}, filter: ${filter}`);
-        await fetchAllMessages(channel, target.id, filter, server);
+        interaction.channel.send(await fetchAllMessages(channel, target.id, filter, server));
     }
 
     if (interaction.commandName === 'chatgpt3') {
@@ -89,9 +89,9 @@ async function fetchAllMessages(channel, user_id, filter, server) {
         });
         messages = await channel.messages.fetch({ limit: 100, before: messages.last().id });
     }
-    channel.send(messages.size === 0 ? 'Done fetching, all messages fetched' : 'Done fetching, token limit reached');
-    console.log(messages.size === 0 ? 'All messages fetched' : 'Token limit reached');
     writeStream.end();
+    console.log(messages.size === 0 ? 'All messages fetched' : 'Token limit reached');
+    return messages.size === 0 ? 'Done fetching, all messages fetched' : 'Done fetching, token limit reached';
 }
 
 function countWords(str) {
